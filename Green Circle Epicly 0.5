@@ -1,0 +1,108 @@
+setscreen ("graphics:800;700")
+setscreen ("offscreenonly")
+
+var chars : array char of boolean
+var dead : boolean := false
+var x, y, speed_upgrade, row, col, coloring, wallup, wallright, walldown, wallleft, size, upgrade_counter : int
+
+const midx := maxx div 2
+const midy := maxy div 2
+
+x := midx
+y := midy
+speed_upgrade := 0
+row := midy
+col := midx
+coloring := brightgreen
+wallup := 0
+walldown := 0
+wallleft := 0
+wallright := 0
+size := 15
+upgrade_counter := 1
+
+proc upgrades (var col : int, var row : int, size : int, colouring : int)
+
+    drawfillbox (row, col, row + size, col + size, colouring)
+
+    if row <= x and x <= row + size and y <= col + size and col <= y then
+        if speed_upgrade < upgrade_counter then
+            speed_upgrade := speed_upgrade + 1
+            coloring := black
+        end if
+    end if
+
+end upgrades
+
+loop
+
+    Input.KeyDown (chars)
+
+    %Circle movement(has to be multiple if statements)
+
+    if chars (KEY_UP_ARROW) or chars ('w') then
+        y := y + 1 + speed_upgrade
+    end if
+
+    if chars (KEY_RIGHT_ARROW) or chars ('d') then
+        x := x + 1 + speed_upgrade
+    end if
+
+    if chars (KEY_LEFT_ARROW) or chars ('a') then
+        x := x - 1 - speed_upgrade
+    end if
+
+    if chars (KEY_DOWN_ARROW) or chars ('s') then
+        y := y - 1 - speed_upgrade
+    end if
+
+    %Sets boundaries for the circle
+
+    if x >= 800 then
+        x := 0
+        wallright := wallright + 1
+    end if
+
+    if y >= 700 then
+        y := 0
+        wallup := wallup + 1
+    end if
+
+    if y <= -4 then
+        y := 700
+        wallleft := walldown + 1
+    end if
+
+    if x <= -4 then
+        x := 800
+        walldown := wallleft + 1
+    end if
+
+    %Exits program
+
+    if chars (KEY_ESC) then
+        exit
+    end if
+
+    %Draws stuff
+
+    if wallright = 2 then
+        if speed_upgrade <= upgrade_counter then
+            upgrades (col, row, 15, brightgreen)
+            upgrade_counter := upgrade_counter + 1
+        end if
+    end if
+
+    drawfillbox (0, 0, maxx, maxy, black)     %Background
+    upgrades (col, row, 15, coloring)
+    drawfilloval (x, y, 4, 4, brightgreen)     %Circle
+    colorback (brightgreen)
+    put upgrade_counter
+    put speed_upgrade
+    View.Update
+
+    delay (2)
+end loop
+
+
+
