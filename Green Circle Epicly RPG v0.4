@@ -1,0 +1,99 @@
+setscreen ("graphics:800;700")
+setscreen ("offscreenonly")
+
+var chars : array char of boolean
+var dead : boolean := false
+var x, y, speed_upgrade, row, col, coloring, counterup, counterright, counterdown, counterleft : int
+
+const midx := maxx div 2
+const midy := maxy div 2
+
+x := midx
+y := midy
+speed_upgrade := 0
+row := midy
+col := midx
+coloring := brightgreen
+counterup := 0
+counterdown := 0
+counterleft := 0
+counterright := 0
+
+proc upgrades (var col : int, var row : int, size : int, colouring : int)
+
+    drawfillbox (row, col, row + size, col + size, colouring)
+
+    if row <= x and x <= row + size and y <= col + size and col <= y then
+        speed_upgrade := 1
+        coloring := black
+    end if
+
+end upgrades
+
+loop
+
+    Input.KeyDown (chars)
+
+    %Circle movement(has to be multiple if statements)
+
+    if chars (KEY_UP_ARROW) or chars ('w') then
+        y := y + 1 + speed_upgrade
+    end if
+
+    if chars (KEY_RIGHT_ARROW) or chars ('d') then
+        x := x + 1 + speed_upgrade
+    end if
+
+    if chars (KEY_LEFT_ARROW) or chars ('a') then
+        x := x - 1 - speed_upgrade
+    end if
+
+    if chars (KEY_DOWN_ARROW) or chars ('s') then
+        y := y - 1 - speed_upgrade
+    end if
+
+    %Sets boundaries for the circle
+
+    if x >= 800 then
+        x := 0
+        counterup := counterup + 1
+    end if
+
+    if y >= 700 then
+        y := 0
+        counterright := counterright + 1
+    end if
+
+    if y <= -5 then
+        y := 700
+        counterleft := counterleft + 1
+    end if
+
+    if x <= -5 then
+        x := 800
+        counterdown := counterdown + 1
+    end if
+
+    %Exits program
+
+    if chars (KEY_ESC) then
+        exit
+    end if
+
+    %Draws stuff
+
+    if counterup > 1 then
+        upgrades (col, row, 15, coloring)
+    end if
+
+        drawfillbox (0, 0, maxx, maxy, black) %Background
+        upgrades (col, row, 15, coloring)
+        drawfilloval (x, y, 4, 4, brightgreen) %Circle
+
+        View.Update
+        delay (10)
+
+    end loop
+
+
+
